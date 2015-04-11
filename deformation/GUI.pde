@@ -14,7 +14,20 @@ void morphTransformationAction(){
       //curve_natural = drawCurve(control_points_out, lambda, 0.1);
       change_points = true;
   }else if(morph_method == MLS){
-      deformed_edges = calculateNewImage(edges,control_points_out);
+      //first modify the world
+      if(world_modified){
+        deformed_world = new ArrayList<PVector>();
+        deformed_world.addAll(edges);
+        getA(deformed_world, world_control_points);
+        deformed_world = calculateNewImage(edges,world_control_points_out);
+        //modify the shape
+        updateControlPoints(deformed_world);
+        //create the world shape in the main scene
+        world_shape = getContours(world_control_points, color(0,255,0,150));
+        deformed_world_shape = getContours(world_control_points_out, color(255,0,0,100));
+        world_modified = false;
+      }
+      deformed_edges = calculateNewImage(deformed_world,control_points_out);
       //modify the shape
       deformed_figure = getContours(deformed_edges, color(217,245,12,100));
       //join to the model
@@ -48,7 +61,7 @@ void addPoint(PVector v){
 
 void mousePressed( ){
   println("coord : " + mouseX + " Y: " + mouseY);
-  if(main_scene.height() < mouseY) return;
+  if((mouseX >= all_width - aux_scene.width()) && mouseY >= all_heigth - aux_scene.height()) return;
   //get coordinates in world
   Vec point_world = main_scene.eye().unprojectedCoordinatesOf(new Vec(mouseX, mouseY));
   //get corrdinates in local frame
@@ -168,6 +181,9 @@ void drawControlPoints(ArrayList<PVector> control_points, ArrayList<PVector> con
 //KEYBOARD HANDLING EVENTS
 boolean reflex = false;
 void keyPressed(){
+  if (key == ' '){
+    showAid = !showAid;
+  }
   if(key == 'r' || key == 'R'){
     reflex = !reflex;
   }

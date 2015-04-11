@@ -88,7 +88,7 @@ ArrayList<PVector> calculateNewImage(ArrayList<PVector> img, ArrayList<PVector> 
 }
 
 void updateControlPoints(){
-  getA(edges,control_points);
+  getA(deformed_world,control_points);
 }
 
 void updateControlPoints(ArrayList<PVector> img){
