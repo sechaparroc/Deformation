@@ -22,7 +22,7 @@ We also consider some deformations that we call "world deformations", so the ide
 
 After the world deformations are applied, then you can use the proposed predefined deformations or add and modify control points over the deformed figure as result by the world deformation.
 
-It's important to know that the proposed method, do a preprocessing of the image (Basically a threshold and then find the contour by 8-connectivity) to consider only the outter contour of it. So for this purpose we use very basic and useful algorithms provided by OpenCV. 
+It's important to know that the proposed method, do a preprocessing of the image (Basically a threshold and then find the contour by Topological Structural Analysis of Digitized Binary Images) to consider only the outter contour of it. So for this purpose we use very basic and useful algorithms provided by OpenCV. 
 
 There is also another dependency library very useful to draw complex scenes: ProScene. So the idea here was to use two scenes:
 - Main Scene: is the scene where you can see the changes produced to the shape, and here you can see three models of    your shape. The first one shows you the original shape enclosed by the shape that represents the original world (a    regular polygon) and the deformed world. The second one shows you the shape as result of world deformations, so is    according to this method where the control points and their images are going to be located to deform the image. The   latest one shows you the final deformed image.
