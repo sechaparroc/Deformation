@@ -26,10 +26,16 @@ void morphTransformationAction(){
         world_shape = getContours(world_control_points, color(0,255,0,150));
         deformed_world_shape = getContours(world_control_points_out, color(255,0,0,100));
         world_modified = false;
+        //modify the shape
+        deformed_world_figure = getContours(deformed_world, color(21,245,217,100));
+        r_deformed_world_figure = getBoundingBox(deformed_world);
+        deformed_world_fig.setShape(deformed_world_figure);
+        //println(r_deformed_world_figure);
       }
       deformed_edges = calculateNewImage(deformed_world,control_points_out);
       //modify the shape
       deformed_figure = getContours(deformed_edges, color(217,245,12,100));
+      r_deformed_figure = getBoundingBox(deformed_edges);
       //join to the model
       deformed_fig.setShape(deformed_figure);
   }
@@ -65,7 +71,7 @@ void mousePressed( ){
   //get coordinates in world
   Vec point_world = main_scene.eye().unprojectedCoordinatesOf(new Vec(mouseX, mouseY));
   //get corrdinates in local frame
-  Vec point_shape = original_fig.coordinatesOf(point_world);
+  Vec point_shape = deformed_world_fig.coordinatesOf(point_world);
   //int point = getPoint(v.x, v.y);
   if(mouseButton == LEFT){
     int pos = getControlPoint(point_shape.x(),point_shape.y());
@@ -104,7 +110,7 @@ void mouseDragged(){
   //get coordinates in world
   Vec point_world = main_scene.eye().unprojectedCoordinatesOf(new Vec(mouseX, mouseY));
   //get corrdinates in local frame
-  Vec point_shape = original_fig.coordinatesOf(point_world);
+  Vec point_shape = deformed_world_fig.coordinatesOf(point_world);
   //println("drag : " + drag_mode);
   if(drag_mode != -1){
     control_points_out.set(drag_mode, new PVector(point_shape.x(), point_shape.y()));
@@ -147,7 +153,7 @@ void drawControlPoints(ArrayList<PVector> control_points, int col){
   p.strokeWeight(5);
   p.stroke(0,255,0);
   //get coordinates in local frame
-  p.point(centroid.x, centroid.y);
+  p.point(r_deformed_world_figure.getCenterX(),r_deformed_world_figure.getCenterY());
   p.stroke(col);
   for(PVector point : control_points){
     p.point(point.x,point.y);
@@ -162,7 +168,8 @@ void drawControlPoints(ArrayList<PVector> control_points, ArrayList<PVector> con
   p.stroke(0,200,140);
   p.strokeWeight(5);  
   //get coordinates in local frame
-  p.point(centroid.x, centroid.y);
+  //println(r_deformed_world_figure);
+  //p.point(r_deformed_world_figure.getCenterX(),r_deformed_world_figure.getCenterY());
   for(int i = 0; i < control_points.size(); i++){
     p.strokeWeight(1);
     p.stroke(255,255,255);

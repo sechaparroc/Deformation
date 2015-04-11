@@ -1,7 +1,6 @@
 import java.util.Random;
 //use preprocessing algorithms (find contours, threshold)
 import gab.opencv.*;
-import java.awt.Rectangle;
 
 //-----------------------------------------------
 //Proscene
@@ -26,9 +25,12 @@ PImage destination_image;
 OpenCV opencv;
 float approximation = 0.1;
 boolean invert = false; //change to true if the information of the image is in black 
-PVector centroid;
 PShape figure;
 PShape deformed_figure;
+PShape deformed_world_figure;
+Rectangle r_figure;
+Rectangle r_deformed_figure;
+Rectangle r_deformed_world_figure;
 PShape world_shape;
 PShape deformed_world_shape;
 ArrayList<Contour> contours        = new ArrayList<Contour>();
@@ -47,7 +49,7 @@ ArrayList<PVector> control_points     = new ArrayList<PVector>();
 ArrayList<PVector> control_points_out = new ArrayList<PVector>(); 
 ArrayList<PVector> world_control_points     = new ArrayList<PVector>(); 
 ArrayList<PVector> world_control_points_out = new ArrayList<PVector>(); 
-boolean world_modified = false;
+boolean world_modified = true;
 //---------------------------------------------
 
 //PGRAPHICS------------------------------------
@@ -73,6 +75,7 @@ int aux_pos_y =  height-all_heigth/3;
 //---------------------------------------------
 //Some models
 InteractiveModelFrame original_fig;
+InteractiveModelFrame deformed_world_fig;
 InteractiveModelFrame deformed_fig;
 ModelContour control_shape;
 boolean showAid = true;
@@ -121,9 +124,10 @@ public class ModelContour extends InteractiveModelFrame{
   @Override
   public void performCustomAction(ClickEvent event) {
     /*draw the shape in the main scene*/
-    Rectangle r = contour.getBoundingBox();
+    Rectangle r = getBoundingBox(edges);
+    PVector centroid = new PVector(r.getCenterX(), r.getCenterY()); 
     float prev_radius = radius;    
-    radius = max(r.width - r.x, r.height - r.y)/2.0;
+    radius = max(r.w - r.x, r.h - r.y)/2.0;
     world_control_points = setInitialPoints(radius,centroid, true);
     world_control_points_out.clear();
     for(PVector p : points){
@@ -209,13 +213,23 @@ void setup(){
   figure = getCountours();
   deformed_world = new ArrayList<PVector>();
   deformed_world.addAll(edges);
+  //save util info (bounding box) in a rectangle class
+  r_figure = getBoundingBox(edges);
+  r_deformed_figure = getBoundingBox(edges);
+  r_deformed_world_figure = getBoundingBox(edges);
+  //println(r_figure);
   //associate the shape with the original shape frame
   original_fig = new InteractiveModelFrame(main_scene, figure);
-  original_fig.translate(-centroid.x,-centroid.y);
+  original_fig.translate(-r_figure.getCenterX(),-r_figure.getCenterY());
   //initial deformed shape without modifications
-  deformed_fig = new InteractiveModelFrame(main_scene);
-  deformed_fig.translate(centroid.x, centroid.y);
+  deformed_world_fig = new InteractiveModelFrame(main_scene, figure);
+  deformed_world_fig.translate(r_figure.getCenterX(),r_figure.getCenterY());
+  //initial deformed shape without modifications
+  deformed_fig = new InteractiveModelFrame(main_scene, figure);
+  deformed_fig.translate(2*r_figure.getCenterX(),2*r_figure.getCenterY());
   //control window
+  morphTransformationAction();
+  
   control_shape = new ModelContour(aux_scene);
   aux_scene.mouseAgent().setButtonBinding(Target.FRAME, LEFT, DOF2Action.CUSTOM);
   aux_scene.mouseAgent().setButtonBinding(Target.FRAME, RIGHT, DOF2Action.ROTATE);
@@ -223,7 +237,6 @@ void setup(){
   aux_scene.mouseAgent().setWheelBinding(Target.FRAME, DOF1Action.CUSTOM);
   aux_scene.mouseAgent().setClickBinding(Target.FRAME, RIGHT, ClickAction.CUSTOM);
   aux_scene.mouseAgent().setClickBinding(Target.FRAME, LEFT, ClickAction.CUSTOM);
-  
 }
 
 
@@ -238,7 +251,9 @@ void draw(){
   main_scene.beginDraw();
   main_graphics.background(0);
   original_fig.draw();
+  deformed_world_fig.draw();
   deformed_fig.draw();
+
   // Save the current model view matrix
   main_graphics.pushMatrix();
   // Multiply matrix to get in the frame coordinate system.
@@ -246,11 +261,19 @@ void draw(){
   original_fig.applyTransformation();//very efficient  
   if(world_shape != null)main_graphics.shape(world_shape);
   if(deformed_world_shape != null)main_graphics.shape(deformed_world_shape);
+  //drawControlPoints(control_points, color(0,0,255));
+  //drawControlPoints(control_points,control_points_out);  
+  main_graphics.popMatrix();
+  main_graphics.pushMatrix();
+  deformed_world_fig.applyTransformation();//very efficient  
   drawControlPoints(control_points, color(0,0,255));
   drawControlPoints(control_points,control_points_out);  
   main_graphics.popMatrix();
+
   main_scene.endDraw();
   main_graphics.endDraw();  
+
+
   image(main_graphics, main_scene.originCorner().x(), main_scene.originCorner().y());
   if (showAid) {
     aux_graphics.beginDraw();

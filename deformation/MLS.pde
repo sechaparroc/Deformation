@@ -104,7 +104,7 @@ void addControlPointsAuto(boolean rand){
     //get coordinates in local frame
     //control_points.add(edges.get(i));
     PVector v = edges.get(i);
-    PVector new_v = new PVector(v.x - centroid.x, v.y - centroid.y);                                          
+    PVector new_v = new PVector(v.x - r_deformed_world_figure.getCenterX(), v.y - r_deformed_world_figure.getCenterY());                                          
     new_v.mult(random(1,2));
     new_v.add(v);
     control_points.add(new_v);
@@ -122,11 +122,11 @@ void scaleW(boolean clear){
     control_points.clear();
     control_points_out.clear();
   }
-  Rectangle r = contour.getBoundingBox();
+  Rectangle r = getBoundingBox(deformed_world);
   PVector top_left = new PVector(r.x, r.y); 
-  PVector bottom_left = new PVector(r.x, r.y + r.height);
-  PVector mid_right = new PVector(r.x + r.width, (float)r.getCenterY()); 
-  PVector movement = new PVector((r.width/8)*randomGaussian(), 0);
+  PVector bottom_left = new PVector(r.x, r.y + r.h);
+  PVector mid_right = new PVector(r.x + r.w, (float)r.getCenterY()); 
+  PVector movement = new PVector((r.w/8)*randomGaussian(), 0);
   PVector mid_right_im = PVector.add(mid_right, movement);
   control_points.add(top_left);
   control_points.add(bottom_left);
@@ -142,11 +142,11 @@ void scaleH(boolean clear){
     control_points.clear();
     control_points_out.clear();
   }
-  Rectangle r = contour.getBoundingBox();
+  Rectangle r = getBoundingBox(deformed_world);
   PVector top_left = new PVector(r.x, r.y); 
-  PVector top_rigth = new PVector(r.x + r.width, r.y);
-  PVector mid_bottom = new PVector((float)r.getCenterX(), r.y + r.height); 
-  PVector movement = new PVector(0, (r.height/8)*randomGaussian());
+  PVector top_rigth = new PVector(r.x + r.w, r.y);
+  PVector mid_bottom = new PVector((float)r.getCenterX(), r.y + r.h); 
+  PVector movement = new PVector(0, (r.h/8)*randomGaussian());
   PVector mid_bottom_im = PVector.add(mid_bottom, movement);
   control_points.add(top_left);
   control_points.add(top_rigth);
@@ -163,20 +163,20 @@ void applyHorizontalSpline(int mode, boolean clear, boolean reflexive){
     control_points.clear();
     control_points_out.clear();
   }
-  Rectangle r = contour.getBoundingBox();
+  Rectangle r = getBoundingBox(deformed_world);
   ArrayList<PVector> spline_control = new ArrayList<PVector>();
   int quantity = 16;
   float e = random(0.3,0.5); //get a new point for each 2 control points
   float t = 0;
   for(int i = 0; i < quantity; i++){
-      float x_pos = r.x + i*(r.width/(quantity-1));
-      float y_mode = mode == 0 ? r.y : mode == 1 ? r.y + r.height : (float) r.getCenterY(); 
+      float x_pos = r.x + i*(r.w/(quantity-1));
+      float y_mode = mode == 0 ? r.y : mode == 1 ? r.y + r.h : (float) r.getCenterY(); 
       float y_pos = y_mode + random(-30, 30); 
       spline_control.add(new PVector(x_pos, y_pos));
   }
   spline_control = drawCurve(spline_control, t, e, false);
   //apply the same transformation to all the points
-  float y_mode = mode == 0 ? r.y : mode == 1 ? r.y + r.height : (float) r.getCenterY(); 
+  float y_mode = mode == 0 ? r.y : mode == 1 ? r.y + r.h : (float) r.getCenterY(); 
   float y_pos = y_mode + random(-20, 20); 
   for(PVector point : spline_control){
     control_points.add(new PVector(point.x, y_pos));
@@ -184,14 +184,14 @@ void applyHorizontalSpline(int mode, boolean clear, boolean reflexive){
   control_points_out.addAll(spline_control);  
   if(!reflexive || mode == 2){
     //put a control point in the oposite side
-    float anchor = mode == 0 ? r.y + r.height : r.y - 20;
+    float anchor = mode == 0 ? r.y + r.h : r.y - 20;
     PVector mid = new PVector((float)r.getCenterX(), anchor); 
     control_points.add(mid);  
     control_points_out.add(mid);  
   }else{
     //put the same calculated points in the oposite place
     //apply the same transformation to all the points
-    float inv_y_mode = mode == 1 ? r.y : mode == 0 ? r.y + r.height : (float) r.getCenterY();
+    float inv_y_mode = mode == 1 ? r.y : mode == 0 ? r.y + r.h : (float) r.getCenterY();
     y_pos = -(y_pos - y_mode) + inv_y_mode; 
     for(int i = 0; i < spline_control.size(); i++){
       PVector point = new PVector(spline_control.get(i).x, spline_control.get(i).y);
@@ -209,21 +209,21 @@ void applyVerticalSpline(int mode, boolean clear, boolean reflexive){
     control_points.clear();
     control_points_out.clear();
   }
-  Rectangle r = contour.getBoundingBox();
+  Rectangle r = getBoundingBox(deformed_world);
   ArrayList<PVector> spline_control = new ArrayList<PVector>();
   int quantity = 16;
   float e = random(0.3,0.5); //get a new point for each 2 control points
   float t = 0;
   for(int i = 0; i < quantity; i++){
-      float y_pos = r.y + i*(r.height/(quantity-1));
-      float x_mode = mode == 0 ? r.x : mode == 1 ? r.y + r.width : (float) r.getCenterX(); 
-      float x_pos = x_mode + random(-30, 30);
+      float y_pos = r.y + i*(r.h/(quantity-1));
+      float x_mode = mode == 0 ? r.x : mode == 1 ? r.x + r.w : (float) r.getCenterX(); 
+      float x_pos = x_mode + random(-20, 20);
       
       spline_control.add(new PVector(x_pos, y_pos));
   }
   spline_control = drawCurve(spline_control, t, e, false);
   //apply the same transformation to all the points
-  float x_mode = mode == 0 ? r.x : mode == 1 ? r.x + r.width : (float) r.getCenterX(); 
+  float x_mode = mode == 0 ? r.x : mode == 1 ? r.x + r.w : (float) r.getCenterX(); 
   float x_pos = x_mode + random(-20, 20); 
   for(PVector point : spline_control){
     control_points.add(new PVector(x_pos, point.y));
@@ -231,14 +231,14 @@ void applyVerticalSpline(int mode, boolean clear, boolean reflexive){
   control_points_out.addAll(spline_control);
   if(!reflexive || mode == 2){
     //put a control point in the oposite side
-    float anchor = mode == 0 ? r.x + r.width : r.x - 20;
+    float anchor = mode == 0 ? r.x + r.w : r.x - 20;
     PVector mid = new PVector(anchor,(float)r.getCenterY()); 
     control_points.add(mid);  
     control_points_out.add(mid);  
   }else{
     //put the same calculated points in the oposite place
     //apply the same transformation to all the points
-    float inv_x_mode = mode == 1 ? r.x : mode == 0 ? r.x + r.width : (float) r.getCenterX();
+    float inv_x_mode = mode == 1 ? r.x : mode == 0 ? r.x + r.w : (float) r.getCenterX();
     x_pos = -(x_pos - x_mode) + inv_x_mode; 
     for(int i = 0; i < spline_control.size(); i++){
       PVector point = new PVector(spline_control.get(i).x, spline_control.get(i).y);

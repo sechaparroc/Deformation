@@ -1,3 +1,27 @@
+public class Rectangle{
+  float x,y,w,h;  
+  public Rectangle(float xx, float yy, float ww, float hh){
+    x = xx;
+    y = yy;
+    w = ww; 
+    h= hh; 
+  }
+  float getCenterX(){
+    return x + w/2;
+  }
+  float getCenterY(){
+    return y + h/2;
+  }
+  @Override
+  public String toString(){
+    String s = "Rectangle: \n";
+    s += "UL : x = " + x + ", y = " + y; 
+    s += "width = " + w + ", height = " + h; 
+    s += "centerX = " + getCenterX() + ", centerY = " + getCenterY(); 
+    return s;
+  }
+}
+
 //COUNTOUR METHODS-------------------------------
 PShape getCountours(){
   PShape img_contours;
@@ -20,11 +44,6 @@ PShape getCountours(){
   println("founded a contour with" + contour.numPoints() + " points");  
   //save the points
   edges = contour.getPoints();
-  //get the center of the image
-  int cx = (int) contour.getBoundingBox().getCenterX();
-  int cy = (int) contour.getBoundingBox().getCenterY();
-  //save this center as a "centroid"
-  centroid = new PVector(cx,cy);
   img_contours = getCountoursShape(last_texture);
   return img_contours;
 }
@@ -105,4 +124,16 @@ ArrayList<PVector> quickSort(ArrayList<PVector> list, PVector comp, int size){
   }
   return list;
 }
+
+public Rectangle getBoundingBox(ArrayList<PVector> points){
+  PVector top = new PVector(9999,9999);
+  PVector bottom = new PVector(-9999,-9999);
+  for(PVector p : points){
+    if(p.x < top.x) top.x = p.x;  
+    if(p.y < top.y) top.y = p.y;  
+    if(p.x > bottom.x) bottom.x = p.x;  
+    if(p.y > bottom.y) bottom.y = p.y;  
+  }
+  return new Rectangle(top.x, top.y , bottom.x - top.x, bottom.y - top.y);
+} 
 //-----------------------------------------------
