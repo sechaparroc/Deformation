@@ -2,7 +2,7 @@
 Affine Tranformations using MLS
 
 This is an implementation in Processing of affine transformations using the method proposed on:
-http://faculty.cs.tamu.edu/schaefer/research/mls.pdf
+http://www.cs.rice.edu/~jwarren/research/mls.pdf
 
 So, the idea is that an image is loaded to the program and there will be some preprocessing to consider just the outter contour of the image. Then, basically you can add, remove and traslate control points and drag them to generate their new positions deformating the shape of the image as Schaefer proposed.
 
