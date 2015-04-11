@@ -85,7 +85,7 @@ boolean showAid = true;
 //right click remove all
 //scroll more or less detail
 public class ModelContour extends InteractiveModelFrame{
-  float radius = 50;
+  float radius = 40;
   float detail = 3;
   ArrayList<PVector> points = new ArrayList<PVector>();
 
@@ -100,7 +100,7 @@ public class ModelContour extends InteractiveModelFrame{
   //scroll action will increase or decrease the detail of the shape
   @Override
   public void performCustomAction(DOF1Event event) {
-    //println("cambio : " + event.x());
+    println("cambio : " + radius);
     detail += event.x();       
     if(detail < 3){ 
       detail=3;
@@ -127,7 +127,7 @@ public class ModelContour extends InteractiveModelFrame{
     Rectangle r = getBoundingBox(edges);
     PVector centroid = new PVector(r.getCenterX(), r.getCenterY()); 
     float prev_radius = radius;    
-    radius = max(r.w - r.x, r.h - r.y)/2.0;
+    radius = max(r.w, r.h)/2.0;
     world_control_points = setInitialPoints(radius,centroid, true);
     world_control_points_out.clear();
     for(PVector p : points){
@@ -136,7 +136,7 @@ public class ModelContour extends InteractiveModelFrame{
       v = new Vec(v.x() + centroid.x,v.y() + centroid.y); 
       world_control_points_out.add(new PVector(v.x(),v.y()));
     }
-    radius = prev_radius;
+    this.radius = prev_radius;
     world_modified = true;   
     morphTransformationAction();
 
@@ -166,10 +166,13 @@ public class ModelContour extends InteractiveModelFrame{
     ArrayList<PVector> points = new ArrayList<PVector>();  
     float step = 360/detail;
     float theta = 0;
+    float poly_angle = radians(step/2.0);
+    float phi = 90;
+    float poly_rad = sqrt(radius*radius + radius*tan(poly_angle)*radius*tan(poly_angle));
     while(theta < 360){
-      Vec v = new Vec(radius*cos(radians(theta)) + centroid.x,radius*sin(radians(theta))+ centroid.y);
+      Vec v = new Vec(poly_rad*cos(radians(theta - phi)) + centroid.x,poly_rad*sin(radians(theta - phi))+ centroid.y);
       if(check_rot){
-        v = new Vec(radius*cos(radians(theta)),radius*sin(radians(theta)));
+        v = new Vec(poly_rad*cos(radians(theta - phi)),poly_rad*sin(radians(theta - phi)));
         v = inverseTransformOf(v);
         v = new Vec(v.x() + centroid.x,v.y() + centroid.y); 
       }
@@ -194,7 +197,7 @@ public class ModelContour extends InteractiveModelFrame{
 
 void setup(){
   //load the image
-  source_image = loadImage("/home/sebchap/Processing/Programs/Deformation/deformation/data/human.png");  
+  source_image = loadImage("test2.png");  
   source_image.resize(0,150);   
   size(all_width, all_heigth, P2D);
   aux_pos_x =  width-all_width/4;
@@ -220,13 +223,16 @@ void setup(){
   //println(r_figure);
   //associate the shape with the original shape frame
   original_fig = new InteractiveModelFrame(main_scene, figure);
-  original_fig.translate(-r_figure.getCenterX(),-r_figure.getCenterY());
+  original_fig.translate(-2*r_figure.getCenterX(),-r_figure.getCenterY());
+  original_fig.scale(0.5);
   //initial deformed shape without modifications
   deformed_world_fig = new InteractiveModelFrame(main_scene, figure);
-  deformed_world_fig.translate(r_figure.getCenterX(),r_figure.getCenterY());
+  deformed_world_fig.translate(0,-r_figure.getCenterY());
+  deformed_world_fig.scale(0.5);
   //initial deformed shape without modifications
   deformed_fig = new InteractiveModelFrame(main_scene, figure);
-  deformed_fig.translate(2*r_figure.getCenterX(),2*r_figure.getCenterY());
+  deformed_fig.translate(2*r_figure.getCenterX(),-r_figure.getCenterY());
+  deformed_fig.scale(0.5);
   //control window
   morphTransformationAction();
   

@@ -100,18 +100,19 @@ void addControlPointsAuto(boolean rand){
   //clear
   control_points.clear();
   control_points_out.clear();
-  for(int i = 0; i < edges.size(); i+=step_per_point){
+  for(int i = 0; i < deformed_world.size(); i+=step_per_point){
     //get coordinates in local frame
     //control_points.add(edges.get(i));
-    PVector v = edges.get(i);
-    PVector new_v = new PVector(v.x - r_deformed_world_figure.getCenterX(), v.y - r_deformed_world_figure.getCenterY());                                          
-    new_v.mult(random(1,2));
-    new_v.add(v);
-    control_points.add(new_v);
-    if(!rand)control_points_out.add(edges.get(i));
-    else{
-      control_points_out.add(PVector.add(control_points.get(control_points.size()-1), 
-                                            new PVector(random(-20,20),random(-20,20))));
+    if(!rand){
+      control_points.add(deformed_world.get(i));
+      control_points_out.add(deformed_world.get(i));
+    }else{
+      PVector v = deformed_world.get(i);
+      PVector new_v = new PVector(v.x - r_deformed_world_figure.getCenterX(), v.y - r_deformed_world_figure.getCenterY());                                          
+      new_v.mult(random(1,2));
+      new_v.add(v);
+      control_points.add(new_v);
+      control_points_out.add(PVector.add(control_points.get(control_points.size()-1), new PVector(random(-20,20),random(-20,20))));
     }
   }
 }
@@ -251,7 +252,7 @@ void applyVerticalSpline(int mode, boolean clear, boolean reflexive){
 
 void combination(boolean reflex){
   ArrayList<PVector> new_img = new ArrayList<PVector>();
-  new_img.addAll(edges);
+  new_img.addAll(deformed_world);
   //splineht
   applyHorizontalSpline(1,true, reflex);
   updateControlPoints(new_img);
@@ -289,7 +290,7 @@ void combination(boolean reflex){
 
 void combinationR(boolean reflex){
   ArrayList<PVector> new_img = new ArrayList<PVector>();
-  new_img.addAll(edges);
+  new_img.addAll(deformed_world);
   //splineht
   applyHorizontalSpline(0,true, reflex);
   updateControlPoints(new_img);

@@ -196,6 +196,8 @@ void keyPressed(){
   }
   if(key == 'c' || key == 'C'){
     clear_points = !clear_points;
+    control_points.clear();
+    control_points_out.clear();   
   }
   if(key == 'v' || key == 'V'){
     step_per_point = edges.size()/((int)random(15,30) + 1);
@@ -203,6 +205,13 @@ void keyPressed(){
     updateControlPoints();
     morphTransformationAction();
   }
+  if(key == 'x' || key == 'X'){
+    step_per_point = edges.size()/((int)random(15,30) + 1);
+    addControlPointsAuto(false);
+    updateControlPoints();
+    morphTransformationAction();
+  }
+
   //predefined transformation
   //scale w
   if(key=='1'){
