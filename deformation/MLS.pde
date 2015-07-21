@@ -34,6 +34,7 @@ void getA(ArrayList<PVector> img, ArrayList<PVector> control){
       PVector pi = control.get(i); 
       PVector p_hat_i = PVector.sub(pi,p_star);
       //inverse
+      /*
       double a = pt_per_wp[0][0];
       double b = pt_per_wp[0][1];
       double c = pt_per_wp[1][0];
@@ -43,9 +44,12 @@ void getA(ArrayList<PVector> img, ArrayList<PVector> control){
       pt_per_wp[0][1] = -1*det_inv* b;
       pt_per_wp[1][0] = -1*det_inv* c;
       pt_per_wp[1][1] = det_inv* a;
+      */
+      float[][] pt_per_wp_inv = papaya.Mat.inverse(Cast.doubleToFloat(pt_per_wp));     
+
       double[] Ai_1 = new double[2];
-      Ai_1[0]= (v_minus_p_s.x * pt_per_wp[0][0]) + (v_minus_p_s.y * pt_per_wp[0][1]); 
-      Ai_1[1]= (v_minus_p_s.x * pt_per_wp[1][0]) + (v_minus_p_s.y * pt_per_wp[1][1]); 
+      Ai_1[0]= (v_minus_p_s.x * pt_per_wp_inv[0][0]) + (v_minus_p_s.y * pt_per_wp_inv[0][1]); 
+      Ai_1[1]= (v_minus_p_s.x * pt_per_wp_inv[1][0]) + (v_minus_p_s.y * pt_per_wp_inv[1][1]); 
       A[counter][i] = Ai_1[0] * p_hat_i.x * w[counter][i] + Ai_1[1] * p_hat_i.y * w[counter][i];    
     }
     counter++;
@@ -88,10 +92,12 @@ ArrayList<PVector> calculateNewImage(ArrayList<PVector> img, ArrayList<PVector> 
 }
 
 void updateControlPoints(){
+  if(control_points.size() < 3) return;  
   getA(deformed_world,control_points);
 }
 
 void updateControlPoints(ArrayList<PVector> img){
+  if(control_points.size() < 3) return;  
   getA(img,control_points);
 }
 

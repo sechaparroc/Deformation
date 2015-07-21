@@ -1,3 +1,5 @@
+import papaya.*;
+
 import java.util.Random;
 //use preprocessing algorithms (find contours, threshold)
 import gab.opencv.*;
@@ -11,6 +13,7 @@ import remixlab.proscene.*;
 import remixlab.dandelion.core.Constants.*;
 import remixlab.dandelion.geom.*;
 import remixlab.dandelion.core.*;
+
 //-----------------------------------------------
 /*Sebastian Chaparro
 William Rpdriguez   
@@ -101,7 +104,7 @@ public class ModelContour extends InteractiveModelFrame{
   @Override
   public void performCustomAction(DOF1Event event) {
     println("cambio : " + radius);
-    detail += event.x();       
+    detail += event.dx();       
     if(detail < 3){ 
       detail=3;
     }else{
@@ -197,9 +200,9 @@ public class ModelContour extends InteractiveModelFrame{
 
 void setup(){
   //load the image
-  source_image = loadImage("test2.png");  
+  source_image = loadImage("human.png");  
   source_image.resize(0,150);   
-  size(all_width, all_heigth, P2D);
+  size(600, 620, P2D);
   aux_pos_x =  width-all_width/4;
   aux_pos_y =  height-all_heigth/3;
   
